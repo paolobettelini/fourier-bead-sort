@@ -1,0 +1,276 @@
+\documentclass{article}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{parskip}
+\usepackage{fullpage}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usepackage{url}
+\usepackage{subfig}
+\usepackage[backend=bibtex]{biblatex}
+
+\usepackage{bettelini}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    urlcolor=blue,
+    pdftitle={Improved bead sort using the Fourier Transform},
+    pdfpagemode=FullScreen,
+}
+
+\addbibresource{./references.bib}
+
+\title{Improved bead sort using the Fourier Transform}
+\author{Paolo Bettelini}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+\subsection{Abstract}
+
+Bead sort has always been an interesting, but useless, sorting algorithm
+for integers. It is able to sort numbers without ever directly comparing them.
+This paper presents my attempt to make it possibly more efficient
+for software when sorting large arrays of numbers.
+
+\subsection{Bead sort}
+
+\textit{Bead sort}\cite{beadsort} or \textit{gravity sort}
+is a natural sorting algorithm.
+This algorithm is primarily used to sort
+integers, but can be extended to sort the rationals.
+
+The basic idea is to represent the unsorted integers
+in a matrix (\ref{fig:a}), where each columns has \(n\) beads.
+We then shift every bead to the right side of the matrix
+until they collide with another bead,
+as if they were affected by gravity.
+The final step is to count the elements in each columns,
+forming the final ordered sequence (\ref{fig:b}).
+
+\begin{figure}[h]
+    \centering
+  
+    \subfloat[Unsorted beads]{
+        \begin{tikzpicture}[scale=0.75]
+            % Draw the array
+            \foreach \i/\n in {0/5, 1/2, 2/7, 3/1, 4/3, 5/4, 6/6} {
+                \draw (\i,0) rectangle ++(1,1);
+                \node at (\i+0.5, 0.5) {\n};
+            }
+            
+            % Beads
+            \foreach \i/\n in {0/5, 1/2, 2/7, 3/1, 4/3, 5/4, 6/6} {
+                \pgfmathsetmacro{\beads}{\n}
+                \foreach \j in {1,...,\beads} {
+                \draw (\i+0.5, \j+0.5) circle (0.3cm);
+                }
+            }
+        \end{tikzpicture}
+        \label{fig:a}
+    }
+    \quad\(\longrightarrow\)\quad
+    \subfloat[Sorted beads]{
+        \begin{tikzpicture}[scale=0.75]
+            % Draw the array
+            \foreach \i/\n in {0/1, 1/2, 2/3, 3/4, 4/5, 5/6, 6/7} {
+                \draw (\i,0) rectangle ++(1,1);
+                \node at (\i+0.5, 0.5) {\n};
+            }
+            
+            % Beads
+            \foreach \i/\n in {0/1, 1/2, 2/3, 3/4, 4/5, 5/6, 6/7} {
+                \pgfmathsetmacro{\beads}{\n}
+                \foreach \j in {1,...,\beads} {
+                \draw (\i+0.5, \j+0.5) circle (0.3cm);
+                }
+            }
+        \end{tikzpicture}
+        \label{fig:b}
+    }
+  
+    \caption{Beads matrix for \(S = 5,2,7,1,3,4,6\)}
+    \label{fig:both}
+\end{figure}
+
+The time complexity of this algorithm ranges from \(O(1)\)
+to \(O(P)\) where \(P=\sum S_k\).
+
+\pagebreak
+
+\section{Algorithm}
+
+\subsection{Core idea}
+
+A classical implementation of the bead sort would execute the following steps:
+\begin{enumerate}
+    \item Construct the initial beads matrix
+    \item Count the amount of elements in each row
+    \item Construct the final beads matrix using the values of Step 2.
+    \item Count the amount of elements in each row
+\end{enumerate}
+
+My idea is to represents the beads matrix as a
+sum of sine functions. Each frequency represents a row,
+and its amplitude the amount of elements in it.
+
+For example
+
+\begin{minipage}{0.3\textwidth}
+    \begin{flushright}        
+    \begin{tikzpicture}[scale=0.5]
+        % Draw the array
+        \foreach \i/\n in {0/3, 1/5, 2/1, 3/1, 4/2, 5/4} {
+            \draw (\i,0) rectangle ++(1,1);
+            \node at (\i+0.5, 0.5) {\n};
+        }
+        
+        % Beads
+        \foreach \i/\n in {0/3, 1/5, 2/1, 3/1, 4/2, 5/4} {
+            \pgfmathsetmacro{\beads}{\n}
+            \foreach \j in {1,...,\beads} {
+            \draw (\i+0.5, \j+0.5) circle (0.3cm);
+            }
+        }
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+\begin{minipage}{0.5\textwidth}
+    \[
+        6\sin(t) + 4\sin(2t) + 3\sin(3t) + 2\sin(4t)+\sin(5t)
+    \]
+\end{minipage}
+
+By using the Fourier Transform on the function representing the matrix
+we can retrieve the amplitudes of the different frequencies
+and construct the final beads matrix.
+
+\subsection{Implementation}
+
+Given a sequence of unordered natural numbers
+\[
+    S=\{n_k\},
+    \quad
+    0 < k \leq |S|
+\]
+we want to find a sequence
+\[
+    \hat{S}=\{m_l\},
+    \quad
+    0 < l \leq |\hat{S}|
+\]
+which is the ordered version of \(S\).
+
+We define a time-dependent function \(X(t)\)
+\[
+    X(t)=
+    \sum_{k=1}^{|S|}
+    \sum_{f=1}^{n_k}
+    \sin(ft)
+\]
+By applying the Fourier Transform we get a frequency-dependent function
+\[
+    \hat{X}(\xi)=\mathcal{F}\{X(t)\}
+\]
+We can now give an explicit formula for \(m_l\)
+\[
+    m_l + 1 = \min(\xi \in \mathbb{N})
+    \quad
+    \text{such that}
+    \quad
+    |\hat{X}(\xi)| < l
+\]
+Note that
+\[
+    \hat{X}(|S|+1)=0
+\]
+
+\pagebreak
+
+\subsection{Computation}
+
+\subsubsection{Complexity of \(X(t)\)}
+
+The function \(X(t)\) has time complexity \(O(N\cdot P)\) where
+\(P=\sum S_k\) for its construction.
+We can reduce this complexity by noting that \(X(t)\) contains
+a geometric series.
+
+\begin{align*}
+    \sum_{f=1}^{n_k} \sin(ft) 
+    &= \Im \sum_{f=1}^{n_k} e^{ift} \\
+    &= \Im \left( e^{it} \frac{e^{itn_k}-1}{e^{it}-1} \right) \\
+    &= \Im \left( e^{it} \frac{e^{in_kt/2}(e^{in_kt/2} - e^{-in_kt/2})}
+        {e^{it/2}(e^{it/2} - e^{-it/2})} \right) \\
+    &= \Im \left( e^{it} \frac{e^{in_kt/2}(2i\sin(n_kt/2))}
+        {e^{it} (2i\sin(t/2))} \right) \\
+    &= \Im \left( e^{i(n_k+1)t/2} \frac{\sin(n_k t/2)}{\sin(t/2)} \right) \\
+    &= \Im \left(
+            ( \cos((n_k+1)t/2) + i\sin((n+1)t/2)) \frac{\sin(n_k t/2)}{\sin(t/2)}
+        \right) \\
+    &= \frac{\sin(n_k t/2)}{\sin(t/2)} \cos((n+1)t/2)
+\end{align*}
+
+Thus,
+\[
+    X(t) = \sum_{k=1}^{|S|} \frac{\sin(n_k t/2)}{\sin(t/2)} \cos((n+1)t/2)
+\]
+The complexity of \(X(t)\) is now \(O(N)\).
+
+\subsubsection{Complexity of \(\hat{X}(\xi)\)}
+
+The Fourier Transform of \(X(t)\) is given by
+\begin{align*}
+    \hat{X}(\xi) &=
+    \frac{1}{\text{max}-\text{min}}
+    \integral[\text{min}][\text{max}]
+    [e^{-2\pi it\xi}X(t)] [t] \\
+    &= \frac{1}{\text{max}-\text{min}}
+    \integral[\text{min}][\text{max}]
+    [e^{-2\pi it\xi}\sum_{k=1}^{|S|} \frac{\sin(n_k t/2)}{\sin(t/2)} \cos((n+1)t/2)]
+    [t]
+    \\ 
+\end{align*}
+
+Since \(|S|\) is finite we can apply an
+interchange of summation and integration
+\[
+    \hat{X}(\xi) =
+    \frac{1}{\text{max}-\text{min}}
+    \sum_{k=1}^{|S|}
+    \,
+    \integral[\text{min}][\text{max}]
+    [\frac{\sin(n_k t/2)}{\sin(t/2)} \cos((n+1)t/2)e^{-2\pi it\xi}]
+    [t]
+\]
+
+If \(\hat{X}(\xi)\) has a closed-form,
+then its complexity is the one of \(X(t)\),
+which is \(O(N)\).
+Alternatively, one may use the FFT algorithm,
+which has complexity \(O(N \log(N))\).
+
+\subsubsection{Complexity of \(m_l\)}
+
+The computation of \(m_l\) requires a scan
+of the frequencies given by \(|\hat{X}(\xi)|\),
+which is \(O(n)\).
+Since the frequencies are ordered it may be optimized
+using a binary search, which has complexity \(O(\log(N))\)
+
+\subsection{Total complexity}
+
+If a closed-form for \(\hat{X}(\xi)\) is found,
+the total complexity is \(O(N) + O(N) + O(\log(N)) = O(N)\). \\
+If the FFT algorithm is used then the total complexity is
+\(O(N) + O(N\log(N)) + O(\log(N)) = O(N\log(N))\).
+
+\nocite{*} % cite all entries
+
+\end{document}
