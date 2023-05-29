@@ -214,12 +214,12 @@ a geometric series.
     &= \Im \left(
             ( \cos((n_k+1)t/2) + i\sin((n+1)t/2)) \frac{\sin(n_k t/2)}{\sin(t/2)}
         \right) \\
-    &= \frac{\sin(n_k t/2)}{\sin(t/2)} \cos((n+1)t/2)
+    &= \frac{\sin(n_k t/2)}{\sin(t/2)} \sin((n+1)t/2)
 \end{align*}
 
 Thus,
 \[
-    X(t) = \sum_{k=1}^{|S|} \frac{\sin(n_k t/2)}{\sin(t/2)} \cos((n+1)t/2)
+    X(t) = \sum_{k=1}^{|S|} \frac{\sin(n_k t/2)}{\sin(t/2)} \sin((n+1)t/2)
 \]
 The complexity of \(X(t)\) is now \(O(N)\).
 
