@@ -195,7 +195,7 @@ Note that
 
 \subsection{Computation}
 
-\subsubsection{Complexity of \(X(t)\)}
+\subsubsection{Time Complexity of \(X(t)\)}
 
 The function \(X(t)\) has time complexity \(O(N\cdot P)\) where
 \(P=\sum S_k\) for its construction.
@@ -212,18 +212,18 @@ a geometric series.
         {e^{it} (2i\sin(t/2))} \right) \\
     &= \Im \left( e^{i(n_k+1)t/2} \frac{\sin(n_k t/2)}{\sin(t/2)} \right) \\
     &= \Im \left(
-            ( \cos((n_k+1)t/2) + i\sin((n+1)t/2)) \frac{\sin(n_k t/2)}{\sin(t/2)}
+            ( \cos((n_k+1)t/2) + i\sin((n_k+1)t/2)) \frac{\sin(n_k t/2)}{\sin(t/2)}
         \right) \\
-    &= \frac{\sin(n_k t/2)}{\sin(t/2)} \sin((n+1)t/2)
+    &= \frac{\sin(n_k t/2)}{\sin(t/2)} \sin((n_k+1)t/2)
 \end{align*}
 
 Thus,
 \[
-    X(t) = \sum_{k=1}^{|S|} \frac{\sin(n_k t/2)}{\sin(t/2)} \sin((n+1)t/2)
+    X(t) = \sum_{k=1}^{|S|} \frac{\sin(n_k t/2)}{\sin(t/2)} \sin((n_k+1)t/2)
 \]
-The complexity of \(X(t)\) is now \(O(N)\).
+The time complexity of \(X(t)\) is now \(O(N)\).
 
-\subsubsection{Complexity of \(\hat{X}(\xi)\)}
+\subsubsection{Time Complexity of \(\hat{X}(\xi)\)}
 
 The Fourier Transform of \(X(t)\) is given by
 \begin{align*}
@@ -233,7 +233,7 @@ The Fourier Transform of \(X(t)\) is given by
     [e^{-2\pi it\xi}X(t)] [t] \\
     &= \frac{1}{\text{max}-\text{min}}
     \integral[\text{min}][\text{max}]
-    [e^{-2\pi it\xi}\sum_{k=1}^{|S|} \frac{\sin(n_k t/2)}{\sin(t/2)} \sin((n+1)t/2)]
+    [e^{-2\pi it\xi}\sum_{k=1}^{|S|} \frac{\sin(n_k t/2)}{\sin(t/2)} \sin((n_k+1)t/2)]
     [t]
     \\ 
 \end{align*}
@@ -246,30 +246,30 @@ interchange of summation and integration
     \sum_{k=1}^{|S|}
     \,
     \integral[\text{min}][\text{max}]
-    [\frac{\sin(n_k t/2)}{\sin(t/2)} \sin((n+1)t/2)e^{-2\pi it\xi}]
+    [\frac{\sin(n_k t/2)}{\sin(t/2)} \sin((n_k+1)t/2)e^{-2\pi it\xi}]
     [t]
 \]
 
 If \(\hat{X}(\xi)\) has a closed-form,
-then its complexity is the one of \(X(t)\),
+then its time complexity is the one of \(X(t)\),
 which is \(O(N)\).
 Alternatively, one may use the FFT algorithm,
-which has complexity \(O(N \log(N))\).
+which has time complexity \(O(N \log(N))\).
 
-\subsubsection{Complexity of \(m_l\)}
+\subsubsection{Time Complexity of \(m_l\)}
 
 The computation of \(m_l\) requires a scan
-of the frequencies given by \(|\hat{X}(\xi)|\),
-which is \(O(n)\).
-Since the frequencies are ordered it may be optimized
-using a binary search, which has complexity \(O(\log(N))\)
+of the frequencies given by \(|\hat{X}(\xi)|\).
+The amount of frequencies to consider is equal to the maximum
+integer in the input.
+Since the amplitude of the frequencies are ordered it may be optimized
+using a binary search, giving a time complexity of \(O(Q)\)
+where \(Q\) is the maximum integer.
 
-\subsection{Total complexity}
+\subsection{Total space complexity}
 
 If a closed-form for \(\hat{X}(\xi)\) is found,
-the total complexity is \(O(N) + O(N) + O(\log(N)) = O(N)\). \\
-If the FFT algorithm is used then the total complexity is
-\(O(N) + O(N\log(N)) + O(\log(N)) = O(N\log(N))\).
+the total space complexity of the algorithm is \(O(1)\).
 
 \nocite{*} % cite all entries
 
