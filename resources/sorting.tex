@@ -38,6 +38,7 @@ Bead sort has always been an interesting, but useless, sorting algorithm
 for integers. It is able to sort numbers without ever directly comparing them.
 This paper presents my attempt to make it possibly more efficient
 for software when sorting large arrays of numbers.
+The resulting algorithm has constant space complexity rather than \(O(N^2)\).
 
 \subsection{Bead sort}
 
@@ -195,11 +196,12 @@ Note that
 
 \subsection{Computation}
 
-\subsubsection{Time Complexity of \(X(t)\)}
+\subsubsection{Complexity of \(X(t)\)}
 
-The function \(X(t)\) has time complexity \(O(N\cdot P)\) where
-\(P=\sum S_k\) for its construction.
-We can reduce this complexity by noting that \(X(t)\) contains
+The function \(X(t)\) has space complexity \(O(1)\).
+It also has time complexity \(O(N\cdot P)\) where
+\(P=\sum S_k\).
+We can reduce the latter by noting that \(X(t)\) contains
 a geometric series.
 
 \begin{align*}
@@ -223,7 +225,7 @@ Thus,
 \]
 The time complexity of \(X(t)\) is now \(O(N)\).
 
-\subsubsection{Time Complexity of \(\hat{X}(\xi)\)}
+\subsubsection{Complexity of \(\hat{X}(\xi)\)}
 
 The Fourier Transform of \(X(t)\) is given by
 \begin{align*}
@@ -251,12 +253,12 @@ interchange of summation and integration
 \]
 
 If \(\hat{X}(\xi)\) has a closed-form,
-then its time complexity is the one of \(X(t)\),
-which is \(O(N)\).
+then its time and space complexities are the ones of \(X(t)\),
+which are \(O(N)\) and \(O(1)\) respectively.
 Alternatively, one may use the FFT algorithm,
-which has time complexity \(O(N \log(N))\).
+which has time and space complexities \(O(N \log(N))\).
 
-\subsubsection{Time Complexity of \(m_l\)}
+\subsubsection{Complexity of \(m_l\)}
 
 The computation of \(m_l\) requires a scan
 of the frequencies given by \(|\hat{X}(\xi)|\).
@@ -265,6 +267,8 @@ integer in the input.
 Since the amplitude of the frequencies are ordered it may be optimized
 using a binary search, giving a time complexity of \(O(Q)\)
 where \(Q\) is the maximum integer.
+
+The space complexity of this operation is always \(O(1)\).
 
 \subsection{Total space complexity}
 
