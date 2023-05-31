@@ -38,7 +38,8 @@ Bead sort has always been an interesting, but useless, sorting algorithm
 for integers. It is able to sort numbers without ever directly comparing them.
 This paper presents my attempt to make it possibly more efficient
 for software when sorting large arrays of numbers.
-The resulting algorithm has constant space complexity rather than \(O(N^2)\).
+The resulting algorithm is efficient when sorting a large array of small integers,
+preferably with few distinct elements.
 
 \subsection{Bead sort}
 
@@ -109,14 +110,6 @@ to \(O(P)\) where \(P=\sum S_k\).
 
 \subsection{Core idea}
 
-A classical implementation of the bead sort would execute the following steps:
-\begin{enumerate}
-    \item Construct the initial beads matrix
-    \item Count the amount of elements in each row
-    \item Construct the final beads matrix using the values of Step 2.
-    \item Count the amount of elements in each row
-\end{enumerate}
-
 My idea is to represents the beads matrix as a
 sum of sine functions. Each frequency represents a row,
 and its amplitude the amount of elements in it.
@@ -158,13 +151,13 @@ Given a sequence of unordered natural numbers
 \[
     S=\{n_k\},
     \quad
-    0 < k \leq |S|
+    0 < k \leq N
 \]
 we want to find a sequence
 \[
     \hat{S}=\{m_l\},
     \quad
-    0 < l \leq |\hat{S}|
+    0 < l \leq N
 \]
 which is the ordered version of \(S\).
 
@@ -179,18 +172,17 @@ By applying the Fourier Transform we get a frequency-dependent function
 \[
     \hat{X}(\xi)=\mathcal{F}\{X(t)\}
 \]
-We can now give an explicit formula for \(m_l\)
-\[
-    m_l + 1 = \min(\xi \in \mathbb{N})
-    \quad
-    \text{such that}
-    \quad
-    |\hat{X}(\xi)| < l
-\]
-Note that
-\[
-    \hat{X}(|S|+1)=0
-\]
+
+For all \(\xi \in \mathbb{N}\), the frequencies given by
+\(|\hat{X}(\xi)|\) are integers, and they follow the property
+\(|\hat{X}(\xi)| \geq |\hat{X}(\xi+1)|\).
+In order to retrieve the ordered elements, we can gradually increase
+the frequency \(\xi\) by \(1\) by starting at \(\xi=1\). \\
+Let \(k=|\hat{X}(\xi)| - |\hat{X}(\xi+1)|\). Whenever \(k \neq 0\)
+we consider \(\xi\) to be the next elements in the sequence of ordered
+integers. The element \(\xi\) will be the next in the ordered sequence,
+and it will appear \(k\) many times.
+Repeat this process until all numbers have been extracted \(\xi = N\).
 
 \pagebreak
 
@@ -274,6 +266,18 @@ The space complexity of this operation is always \(O(1)\).
 
 If a closed-form for \(\hat{X}(\xi)\) is found,
 the total space complexity of the algorithm is \(O(1)\).
+
+\section{Conclusion}
+
+The Fourier transform is able to directly encode the data of the beads matrix
+into a function efficiently. As the magnitude of the numbers to sort
+increase, the efficiency of the algorithm drops. However, one may note
+that multiple integers that are equal
+will collapse in the same point of \(\hat{X}(\xi)\),
+meaning that equal integers will not add complexity to the retrieval
+of the elements from \(\hat{X}(\xi)\). Thus,
+this algorithm is efficient for sorting large arrays of small integers
+with few distinct elements.
 
 \nocite{*} % cite all entries
 
