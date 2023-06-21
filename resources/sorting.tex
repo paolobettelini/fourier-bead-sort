@@ -10,6 +10,7 @@
 \usepackage{url}
 \usepackage{subfig}
 \usepackage[backend=bibtex]{biblatex}
+\usepackage{fancyhdr}
 
 \usepackage{bettelini}
 
@@ -21,6 +22,12 @@
     pdfpagemode=FullScreen,
 }
 
+\fancypagestyle{plain}{%
+  \fancyhf{} % Clear header and footer
+  \fancyfoot[R]{\thepage} % Page number in the center
+  \fancyfoot[L]{© 2023 Paolo Bettelini. Creative Commons CC BY-SA 4.0}
+}
+
 \addbibresource{./references.bib}
 
 \title{Improved bead sort using the Fourier Transform}
@@ -28,6 +35,8 @@
 \date{\today}
 
 \begin{document}
+
+\thispagestyle{plain}
 
 \maketitle
 
