@@ -243,11 +243,11 @@ Another approach is to use an approximation to a closed-form of \(\hat{X}_S(\xi)
 The Fourier Transform of \(X_S(t)\) is given by
 \begin{align*}
     \hat{X}_S(\xi) &=
-    \frac{1}{\text{max}(S)-1}
-    \integral[1][\text{max}(S)]
+    \frac{1}{2\pi}
+    \integral[0][2\pi]
     [e^{-2\pi it\xi}X(t)] [t] \\
-    &= \frac{1}{\text{max}(S)-1}
-    \integral[1][\text{max}(S)]
+    &= \frac{1}{2\pi}
+    \integral[0][2\pi]
     [e^{-2\pi it\xi}\sum_{k=1}^{|S|} \frac{\sin(n_k t/2)}{\sin(t/2)} \sin((n_k+1)t/2)]
     [t]
     \\ 
@@ -257,10 +257,10 @@ Since \(|S|\) is finite we can apply an
 interchange of summation and integration
 \[
     \hat{X}_S(\xi) =
-    \frac{1}{\text{max}(S)-1}
+    \frac{1}{2\pi}
     \sum_{k=1}^{|S|}
     \,
-    \integral[1][\text{max}(S)]
+    \integral[0][2\pi]
     [\frac{\sin(n_k t/2)}{\sin(t/2)} \sin((n_k+1)t/2)e^{-2\pi it\xi}]
     [t]
 \]
