@@ -7,11 +7,13 @@
 \usepackage{fullpage}
 \usepackage{hyperref}
 \usepackage{tikz}
+\usepackage{wrapfig}
 \usepackage{url}
 \usepackage{subfig}
+\usepackage{bettelini}
 \usepackage[backend=bibtex]{biblatex}
 
-\usepackage{bettelini}
+\usetikzlibrary{cd}
 
 \hypersetup{
     colorlinks=true,
@@ -23,6 +25,10 @@
 
 \addbibresource{./references.bib}
 
+\newtheorem{definition}{Definition}[section]
+\newtheorem{corollary}{Corollary}[section]
+\newtheorem{proof}{Proof}[section]
+
 \title{Improved bead sort using Fourier Analysis}
 \author{Paolo Bettelini}
 \date{\today}
@@ -30,16 +36,18 @@
 \begin{document}
 
 \maketitle
+\tableofcontents
+\pagebreak
 
 \section{Introduction}
 
 \subsection{Abstract}
 
-Bead sort has always been an interesting, but useless, sorting algorithm
-for integers. It is able to sort numbers without ever directly comparing them.
+Bead sort has always been an interesting, but rather useless, sorting algorithm
+for natural numbers. It is able to sort numbers without ever directly comparing them.
 This paper presents an attempt to make it possibly more efficient
 for software when sorting large arrays of numbers.
-The resulting algorithm is more efficient (less than \(O(N^2)\)) when sorting a large array of small integers,
+The resulting algorithm is more efficient (less than \(O(N^2)\)) when sorting a very large array of small integers,
 preferably with few distinct elements.
 
 \subsection{Bead sort}
@@ -47,9 +55,9 @@ preferably with few distinct elements.
 \textit{Bead sort}\cite{beadsort} or \textit{gravity sort}
 is a natural sorting algorithm.
 This algorithm is primarily used to sort
-integers, but can be extended to sort the rationals.
+natural numbers, but can be extended to sort the rationals.
 
-The basic idea is to represent the unsorted integers
+The basic idea is to represent the unsorted natural numbers
 in a matrix (\ref{fig:a}), where each columns has \(n\) beads.
 We then shift every bead to the right side of the matrix
 until they collide with another bead,
@@ -109,15 +117,53 @@ to \(O(P)\) where \(P=\sum S_k\).
 
 \section{Algorithm}
 
-\subsection{Core idea}
+\subsection{Matrix representation}
 
-Let \(S\) be the list of unsorted positive integers.
+\begin{definition}
+    Let \(a_n \in {\mathbb{N}}^N\) be the non-empty sequence of \(N\) numbers in \({\mathbb{N}}^*\) to sort,
+    indexed as \((a_1, a_2, \cdots, a_N)\).
+\end{definition}
 
-The core idea is to represents the beads matrix as a
-sum of sine functions. Each frequency represents a row of beads,
-and its amplitude the amount of elements in it.
+\begin{definition}
+    A matrix \(M\) with element \(m_{i,j}\) is said to be \textit{numeric} if
+    \begin{enumerate}
+        \item \(m_{i,j} \in \{0,1\}\).
+        \item \(m_{i,j} = 0 \implies m_{a,j} = 0, \quad a \leq i \).
+        \item \(m_{i,j} = 1 \implies m_{a,j} = 1, \quad a \geq i \).
+    \end{enumerate}
+\end{definition}
 
-\textbf{Example for \(S = 5,3,5,6,1,2\):}
+\textit{Remark.} A numeric matrix is a matrix where each column is made of \(0\)s followed by
+some amount of \(1\)s. Thus, each column represents a number in \(\mathbb{N}\)
+if the \(1\)s are counted.
+A numeric matrix is a representation of the matrix used in gravity sort.
+
+\begin{definition}
+    Let \(\tilde{M}\) be the set of all matrices that are numeric.
+\end{definition}
+
+\begin{definition}
+    Let \(f\colon {\mathbb{N}}^N \to \tilde{M}\) be a non-injective, surjective function
+    such that \(f(a_n)\) is defined as the matrix of size \(\max\{a_n\} \times N\)
+    with elements \(m_{i,j}\) where
+    \[
+        m_{i,j} =
+        \begin{cases}
+            0 & \max\{a_n\} - i > a_j \\
+            1 & \max\{a_n\} - i \leq a_j
+        \end{cases}
+    \]
+    which is obviously numeric.
+\end{definition}
+
+\textit{Remark.} The function \(f\) transform a sequence of natural numbers into its corresponding
+numeric matrix. We are now going to create a function that transforms 
+a numeric matrix given by a sequence into a sinusoidal function.
+The construction is made such that each row of the matrix represents a frequency
+starting at \(\xi=1\) from the bottom up. The amount of \(1\)s in the row
+is the magnitude of the frequency.
+
+\textit{Example.} Consider the sequence \(a_n = (5,3,5,6,1,2)\).
 
 \begin{minipage}{0.3\textwidth}
     \begin{flushright}        
@@ -138,174 +184,238 @@ and its amplitude the amount of elements in it.
     \end{tikzpicture}
     \end{flushright}
 \end{minipage}
+\hspace{0.5cm}\(\longrightarrow\)\hspace{0.5cm}
 \begin{minipage}{0.5\textwidth}
     \[
         6\sin(t) + 5\sin(2t) + 4\sin(3t) + 3\sin(4t)+3\sin(5t)+\sin(6t)
     \]
 \end{minipage}
 
-We define this function as a time-dependent function \(X_S(t)\).
-\[
-    X_S(t) \triangleq
-    \sum_{k=1}^{|S|}
-    \sum_{f=1}^{n_k}
-    \sin(ft)
-\]
+\begin{definition}
+    Let \(X(t)\) be a time-dependant function
+    \[
+        X(t) \triangleq
+        \sum_{k=1}^{N}
+        \sum_{f=1}^{a_k}
+        \sin(ft)
+    \]
+\end{definition}
 
-By using the Fourier Transform on the function representing the matrix
-we can retrieve the amplitudes of the different frequencies
-and represent the final beads matrix.
-Thus, we get a frequency-dependent function
-\[
-    \hat{X}_S(\xi)
-    \triangleq
-    \mathcal{F}\{X_S(t)\}
-\]
+\textit{Remark.} The function \(X(t)\) is defined as a naive count of each \(1\) in the numeric matrix.
+For each frequency \(\xi\), \(X(t)\) will contain the frequency \(\xi\) with a magnitude equal to
+number of \(1\)s in the row corresponding to \(\xi\).
+Many numeric matrices correspond to the same function, since the information of the initial order is lost.
 
-For all \(\xi \in \mathbb{N}\), the frequencies given by
-\(|\hat{X}_S(\xi)|\) are integers, and they follow the property
-\(|\hat{X}_S(\xi)| \geq |\hat{X}_S(\xi+1)|\).
-The first is value is \(|\hat{X}_S(1)|=|S|\) since every number in \(S\) produces 
-the frequency 1 of the first row of beads (every element is at least 1). \\
-In order to retrieve the ordered elements, we can gradually increase
+It can be noted that computing \(X(t)\) at some point \(t=k\) has a high time complexity.
+A computer needs to add a sine function for each \(1\) in the matrix, meaning
+more operations as the amount of numbers increase and as the value of the numbers increase.
+Thus, computing \(X(t)\) has a time complexity of \(O(N \cdot P)\) where
+\(P=\sum a_n\).
+
+\begin{corollary}
+    The function \(X(t)\) is equal to
+    \[
+        \sum_{k=1}^{N} \frac{\sin(a_k t/2)}{\sin(t/2)} \sin((a_k+1)t/2)
+    \]
+    for \(t \neq 0\).
+\end{corollary}
+
+\begin{proof}
+    Note that the naive definition of \(X(t)\) contains a geometric series.
+    \begin{align*}
+        \sum_{k=1}^{N} \sum_{f=1}^{n_k} \sin(ft) 
+        &= \sum_{k=1}^{N} \Im \sum_{f=1}^{n_k} e^{ift} \\
+        &= \sum_{k=1}^{N} \Im \left( e^{it} \frac{e^{itn_k}-1}{e^{it}-1} \right) \\
+        &= \sum_{k=1}^{N} \Im \left( e^{it} \frac{e^{in_kt/2}(e^{in_kt/2} - e^{-in_kt/2})}
+            {e^{it/2}(e^{it/2} - e^{-it/2})} \right) \\
+        &= \sum_{k=1}^{N} \Im \left( e^{it} \frac{e^{in_kt/2}(2i\sin(n_kt/2))}
+            {e^{it} (2i\sin(t/2))} \right) \\
+        &= \sum_{k=1}^{N} \Im \left( e^{i(n_k+1)t/2} \frac{\sin(n_k t/2)}{\sin(t/2)} \right) \\
+        &= \sum_{k=1}^{N} \Im \left(
+                ( \cos((n_k+1)t/2) + i\sin((n_k+1)t/2)) \frac{\sin(n_k t/2)}{\sin(t/2)}
+            \right) \\
+        &= \sum_{k=1}^{N} \frac{\sin(n_k t/2)}{\sin(t/2)} \sin((n_k+1)t/2)
+    \end{align*}
+\end{proof}
+
+\textit{Remark.} The time complexity of \(X(t)\) can be now reduced to \(O(N)\)
+using this representation.
+
+\subsection{Fourier Transform}
+
+\begin{definition}
+    Let \(\hat{X}(\xi)\) be the Fourier Transform of \(X(t)\).
+    \[
+        \hat{X}(\xi)
+        \triangleq
+        \mathcal{F}\{X(t)\}
+    \]
+    which is a frequency-dependent function.
+\end{definition}
+
+\textit{Remark.} The idea of the algoritm is to apply the Fourier Transform to \(X(t)\)
+in order to retrive the amount of each frequency in the function, thus retrieving
+the amount of \(1\)s for each row.
+The amount of \(1\)s in the row corresponding to the frequency \(\xi\) is given by \(|\hat{X}(\xi)|\).
+
+\begin{corollary}
+    The closed-form for \(\hat{X}(\xi)\) is given by
+    \[
+        \hat{X}(\xi) =
+        \frac{1}{2\pi}
+        \sum_{k=1}^{N}
+        \,
+        \integral[0][2\pi]
+        [\frac{\sin(a_k t/2)}{\sin(t/2)} \sin((a_k+1)t/2)e^{-2\pi it\xi}]
+        [t]
+    \]
+    for \(t \neq 0\).
+\end{corollary}
+
+\begin{proof}
+    By the representation of \(X(t)\)
+    \begin{align*}
+        \hat{X}(\xi) &=
+        \frac{1}{2\pi}
+        \integral[0][2\pi]
+        [e^{-2\pi it\xi}X(t)] [t] \\
+        &= \frac{1}{2\pi}
+        \integral[0][2\pi]
+        [e^{-2\pi it\xi}\sum_{k=1}^{N} \frac{\sin(a_k t/2)}{\sin(t/2)} \sin((a_k+1)t/2)]
+        [t]
+        \\ 
+    \end{align*}
+    
+    Since \(N\) is finite we can apply an
+    interchange of summation and integration
+    \[
+        \hat{X}(\xi) =
+        \frac{1}{2\pi}
+        \sum_{k=1}^{N}
+        \,
+        \integral[0][2\pi]
+        [\frac{\sin(a_k t/2)}{\sin(t/2)} \sin((a_k+1)t/2)e^{-2\pi it\xi}]
+        [t]
+    \]
+\end{proof}
+
+\textit{Remark.} The time complexity of computing this function at a point using its closed-form is \(O(N)\)
+and the space complexity \(O(1)\).
+Another approach would be to use the Fast Fourier Transform.
+The time complexity of the FFT is \(O(N\log(N))\), but we would first
+need to allocate a discrete approximation of \(X(t)\) in memory.
+The space complexity of this operation would be \(O(\max\{a_n\})\).
+
+\subsection{Sorting Algorithm}
+
+The amount of \(1\)s in each row, computed using the Fourier Transform,
+can be used to generate the sorted sequence of numbers.
+The principle is the same as the one used during gravity sort:
+counting the \(1\)s in each column of the sorted numeric matrix gives the ordered sequence.
+
+For all \(\xi \in {\mathbb{N}}^*\), the frequencies given by
+\(|\hat{X}(\xi)|\) are integers, and they follow the property
+\(|\hat{X}(\xi)| \geq |\hat{X}(\xi+1)|\).
+The first value is always \(|\hat{X}(1)|=N\), since every number in \(a_n\) produces 
+the frequency \(1\) of the first row of the numeric matrix (because the sequence is non-empty, every element is at least 1).
+
+In order to retrieve the sorted numbers, we can gradually increase
 the frequency \(\xi\) by \(1\) starting at \(\xi=1\). \\
-Let \(k=|\hat{X}_S(\xi)| - |\hat{X}_S(\xi+1)|\). Whenever \(k \neq 0\)
+Let \(k=|\hat{X}(\xi)| - |\hat{X}(\xi+1)|\). Whenever \(k \neq 0\)
 we consider \(\xi\) to be the next elements in the list of ordered
 integers. The element \(\xi\) will be the next in the ordered sequence,
 and it will appear \(k\) many times.
 Repeat this process until all numbers have been extracted
-(\(\xi = \text{max}(S)\) or \(|\hat{X}_S(\xi)|=0\)).
+(\(\xi = \text{max}(S)\) or \(|\hat{X}(\xi)|=0\)).
 
-\textbf{Example for \(S = 5,3,5,6,1,2\):}
-The first values of \(|\hat{X}_S(\xi)|\) for positive integer frequencies are the following
-\[
-    6, 5, 4, 3, 3, 1, 0, 0, 0, 0, \cdots
-\]
-We are looking for the case where \(k \neq 0\), meaning whenever
-\(|\hat{X}_S(\xi+1)| < |\hat{X}_S(\xi)|\). \\
-At frequency \(1\), the value \(6\) decreases to \(5\), meaning that the first sorted element is \(1\). \\
-At frequency \(2\), the value \(5\) decreases to \(4\), meaning that the next sorted element is \(2\). \\
-At frequency \(3\), the value \(4\) decreases to \(3\), meaning that the next sorted element is \(3\). \\
-At frequency \(5\), the value \(3\) decreases to \(1\), meaning that the next sorted elements are the number \(5\)
-repeated two times (\(3-1=2\)). \\
-At frequency \(6\), the value \(1\) decreases to \(1\), meaning that the last sorted element is \(6\).
+\textit{Example.} Consider the sequence \(a_n = (5,3,5,6,1,2)\).\\
+Then, \(X(t)=6\sin(t) + 5\sin(2t) + 4\sin(3t) + 3\sin(4t)+3\sin(5t)+\sin(6t)\) and
 
-It is important to note that the duplicate numbers,
+\begin{figure}[ht]
+\begin{minipage}{0.5\textwidth}
+    \[
+        f(a_n) = \begin{bmatrix}
+            0 & 0 & 0 & 1 & 0 & 0 \\
+            1 & 0 & 1 & 1 & 0 & 0 \\
+            1 & 0 & 1 & 1 & 0 & 0 \\
+            1 & 1 & 1 & 1 & 0 & 0 \\
+            1 & 1 & 1 & 1 & 0 & 1 \\
+            1 & 1 & 1 & 1 & 1 & 1
+        \end{bmatrix}
+    \]
+\end{minipage}
+\begin{minipage}{0.5\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=0.40]
+        % Draw the array
+        \foreach \i/\n in {0/1, 1/2, 2/3, 3/5, 4/5, 5/6} {
+            \draw (\i,0) rectangle ++(1,1);
+            \node at (\i+0.5, 0.5) {\n};
+        }
+        
+        % Beads
+        \foreach \i/\n in {0/1, 1/2, 2/3, 3/5, 4/5, 5/6} {
+            \pgfmathsetmacro{\beads}{\n}
+            \foreach \j in {1,...,\beads} {
+            \draw (\i+0.5, \j+0.5) circle (0.3cm);
+            }
+        }
+    \end{tikzpicture}
+    \caption{Sorted numerical matrix of \(a_n\)}
+\end{minipage}
+\end{figure}
+
+The values of \(|\hat{\xi}|\) are easy to guess by looking at \(X(t)\).
+
+\begin{center}
+\begin{tikzcd}
+    \hat{X}(1)=6 \arrow[r, "k=1"', bend right] & \hat{X}(2)=5 \arrow[r, "k=1"', bend right] & \hat{X}(3)=4 \arrow[r, "k=1"', bend right] & \hat{X}(4)=3 \\
+    \hat{X}(5)=3 \arrow[r, "k=2"', bend right] & \hat{X}(6)=1 \arrow[r, "k=1", bend right]  & \hat{X}(7)=0 \arrow[r, "k=0"', bend right] & \hat{X}(8)=0
+\end{tikzcd}
+\end{center}
+
+Note that \(\hat{X}(\xi) = 0\) for \(\xi > 6\).
+We are looking for the cases where \(k \neq 0\). \\
+\begin{enumerate}
+    \item At frequency \(1\), the value \(6\) decreases to \(5\), meaning that the first sorted element is \(1\).
+    \item At frequency \(2\), the value \(5\) decreases to \(4\), meaning that the next sorted element is \(2\).
+    \item At frequency \(3\), the value \(4\) decreases to \(3\), meaning that the next sorted element is \(3\).
+    \item At frequency \(5\), the value \(3\) decreases to \(1\), meaning that the next sorted elements are the number \(5\)
+    repeated two times (\(k=3-1=2\)).
+    \item At frequency \(6\), the value \(1\) decreases to \(1\), meaning that the last sorted element is \(6\).
+\end{enumerate}
+
+It is important to note that duplicate numbers,
 such as \(5\) in this case, collapse under the same
-point in \(|\hat{X}_S(\xi)|\).
+point in \(|\hat{X}(\xi)|\).
 
-\pagebreak
+\section{Space and time complexities}
 
-\subsection{Computation}
+The ordered elements need to be retrived from \(\max\{a_n\}\) values of
+\(|\hat{X}(\xi)|\). Let \(A\) be the average distance between two consecutive sorted
+elements in \(a_n\) and \(D\) be the amount of distinct elements in \(a_n\).\\
+Note that \(D \cdot A \approx \max\{a_n\}\) for an homogeneous distribution.
 
-\subsubsection{Complexity of \(X_S(t)\)}
-
-The function \(X_S(t)\) has time complexity \(O(N\cdot P)\) where
-\(P=\sum S_k\).
-This is because we need to add a term for each bead in the matrix.
-We can reduce the latter by noting that \(X_S(t)\) contains
-a geometric series.
-
-\begin{align*}
-    \sum_{f=1}^{n_k} \sin(ft) 
-    &= \Im \sum_{f=1}^{n_k} e^{ift} \\
-    &= \Im \left( e^{it} \frac{e^{itn_k}-1}{e^{it}-1} \right) \\
-    &= \Im \left( e^{it} \frac{e^{in_kt/2}(e^{in_kt/2} - e^{-in_kt/2})}
-        {e^{it/2}(e^{it/2} - e^{-it/2})} \right) \\
-    &= \Im \left( e^{it} \frac{e^{in_kt/2}(2i\sin(n_kt/2))}
-        {e^{it} (2i\sin(t/2))} \right) \\
-    &= \Im \left( e^{i(n_k+1)t/2} \frac{\sin(n_k t/2)}{\sin(t/2)} \right) \\
-    &= \Im \left(
-            ( \cos((n_k+1)t/2) + i\sin((n_k+1)t/2)) \frac{\sin(n_k t/2)}{\sin(t/2)}
-        \right) \\
-    &= \frac{\sin(n_k t/2)}{\sin(t/2)} \sin((n_k+1)t/2)
-\end{align*}
-
-Thus,
-\[
-    X(t) = \sum_{k=1}^{|S|} \frac{\sin(n_k t/2)}{\sin(t/2)} \sin((n_k+1)t/2)
-\]
-The time complexity of \(X_S(t)\) is now \(O(N)\).
-
-\subsubsection{Complexity of \(\hat{X}_S(\xi)\)}
-
-One approach to compute the values of \(\hat{X}_S(\xi)\) would be to use the
-FFT algorithm. The time complexity of the FFT is \(O(N\log(N))\), but we would first
-need to allocate a discrete approximation of \(X_S(t)\) in memory.
-This procedure would need to allocate \(\text{max}(S)\) values, resulting in a space complexity
-of \(O(\text{max}(S))\). Furthermore, computing a value of \(X_S(t)\) has time complexity
-\(O(N^2)\), meaning that this operation would have time complexity \(O(N^2) + O(N\log(N)=O(N^2))\).
-This would also be the total time complexity of the algorithm, since the
-retrieval of sorted integers is at most \(O(N)\)
-(using a linear scan of the frequencies, which are already allocated in memory).
-
-Another approach is to use an approximation to a closed-form of \(\hat{X}_S(\xi)\). \\
-The Fourier Transform of \(X_S(t)\) is given by
-\begin{align*}
-    \hat{X}_S(\xi) &=
-    \frac{1}{2\pi}
-    \integral[0][2\pi]
-    [e^{-2\pi it\xi}X(t)] [t] \\
-    &= \frac{1}{2\pi}
-    \integral[0][2\pi]
-    [e^{-2\pi it\xi}\sum_{k=1}^{|S|} \frac{\sin(n_k t/2)}{\sin(t/2)} \sin((n_k+1)t/2)]
-    [t]
-    \\ 
-\end{align*}
-
-Since \(|S|\) is finite we can apply an
-interchange of summation and integration
-\[
-    \hat{X}_S(\xi) =
-    \frac{1}{2\pi}
-    \sum_{k=1}^{|S|}
-    \,
-    \integral[0][2\pi]
-    [\frac{\sin(n_k t/2)}{\sin(t/2)} \sin((n_k+1)t/2)e^{-2\pi it\xi}]
-    [t]
-\]
-
-The space complexity of this approach would be \(O(1)\). As a side effect,
-the values of \(\hat{X}_S(\xi)\) are not allocated, so their computation
-has always time complexity of \(O(N)\).
-
-\subsubsection{Complexity of the retrieval}
-
-The ordered elements need to be retrived from \(\text{max}(S)\) values of
-\(\hat{X}_S(\xi)\). Let \(A\) be the average distance between two consecutive sorted
-elements in \(S\) and \(D\) be the amount of distinct elements in \(S\).\\
-Note that \(D \cdot A \approx \text{max}(S)\).
-\\
-Considering a closed-form for \(\hat{X}_S\), the retrival has time complexity
-\(O(N^2)\) if we linearly scan the frequencies given by \(|\hat{X}_S|\).
-
-We can optimize this operation by using a sort of binary search.
-The binary search will be used to reach the next point where \(|\hat{X}_S|\) decreases.
+When using a closed-form for \(\hat{X}\), the retrival has time complexity
+\(O(N \cdot \max\{a_n\})\) if we scan the frequencies linearly.
+It is possible to optimize this operation using a binary search or similar approaches.
+The binary search will be used to reach the next point where \(|\hat{X}|\) decreases.
 The binary search will be repeated \(D\) times, and for each time
 it will travel approximately \(A\) values. Since computing each value has cost \(O(N)\),
 and the cost of a binary search is \(O(\log(N))\),
-the final time complexity is \(O(D\cdot N \log(A))\).
+the final time complexity is \(O(D \cdot N \log(A))\).
+The space complexity is always \(O(1)\).
 
 \section{Conclusion}
 
-In conclusion we have the following complexities: \\
-\textbf{FFT}
-\begin{itemize}
-    \item \text{Time complexity:} \(O(N^2)\)
-    \item \text{Space complexity:} \(O(\text{max}(S))\)
-\end{itemize}
-\textbf{Closed-form}
-\begin{itemize}
-    \item \text{Time complexity:} \(O(D\cdot N \log_2(A))\)
-    \item \text{Space complexity:} \(O(1)\)
-\end{itemize}
+The time complexity of \(O(D \cdot N \log(A))\), where \(A\)
+is the average distance between two consecutive sorted
+elements and \(D\) is the amount of distinct elements in the array,
+can be sometimes advantageous.
 
-The latter time complexity is generally more than \(O(N^2)\),
-but as \(N \to \infty\), with smaller values for \(D\) and \(A\) it may actually
-be a good compromise.
-
-For both of the implementations the complexities are independent
-of the initial order status of \(S\).
+An important property of this algorithm is its case-independence.
+The initial orderliness of the array (best case, average case and best case)
+do not affect the performance.
 
 \nocite{*} % cite all entries
 
