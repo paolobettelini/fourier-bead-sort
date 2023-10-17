@@ -192,7 +192,7 @@ is the magnitude of the frequency.
 \end{minipage}
 
 \begin{definition}
-    Let \(X(t)\) be a time-dependant function
+    Let \(X(t)\) be a time-dependent function
     \[
         X(t) \triangleq
         \sum_{k=1}^{N}
@@ -203,7 +203,7 @@ is the magnitude of the frequency.
 
 \textit{Remark.} The function \(X(t)\) is defined as a naive count of each \(1\) in the numeric matrix.
 For each frequency \(\xi\), \(X(t)\) will contain the frequency \(\xi\) with a magnitude equal to
-number of \(1\)s in the row corresponding to \(\xi\).
+the number of \(1\)s in the row corresponding to \(\xi\).
 Many numeric matrices correspond to the same function, since the information of the initial order is lost.
 
 It can be noted that computing \(X(t)\) at some point \(t=k\) has a high time complexity.
@@ -253,8 +253,8 @@ using this representation.
     which is a frequency-dependent function.
 \end{definition}
 
-\textit{Remark.} The idea of the algoritm is to apply the Fourier Transform to \(X(t)\)
-in order to retrive the amount of each frequency in the function, thus retrieving
+\textit{Remark.} The idea of the algorithm is to apply the Fourier Transform to \(X(t)\)
+in order to retrieve the amount of each frequency in the function, thus retrieving
 the amount of \(1\)s for each row.
 The amount of \(1\)s in the row corresponding to the frequency \(\xi\) is given by \(|\hat{X}(\xi)|\).
 
@@ -286,7 +286,7 @@ The amount of \(1\)s in the row corresponding to the frequency \(\xi\) is given 
         \\ 
     \end{align*}
     
-    Since \(N\) is finite we can apply an
+    Since \(N\) is finite, we can apply an
     interchange of summation and integration
     \[
         \hat{X}(\xi) =
@@ -391,12 +391,12 @@ point in \(|\hat{X}(\xi)|\).
 
 \section{Space and time complexities}
 
-The ordered elements need to be retrived from \(\max\{a_n\}\) values of
+The ordered elements need to be retrieved from \(\max\{a_n\}\) values of
 \(|\hat{X}(\xi)|\). Let \(A\) be the average distance between two consecutive sorted
 elements in \(a_n\) and \(D\) be the amount of distinct elements in \(a_n\).\\
 Note that \(D \cdot A \approx \max\{a_n\}\) for an homogeneous distribution.
 
-When using a closed-form for \(\hat{X}\), the retrival has time complexity
+When using a closed-form for \(\hat{X}\), the retrieval has time complexity
 \(O(N \cdot \max\{a_n\})\) if we scan the frequencies linearly.
 It is possible to optimize this operation using a binary search or similar approaches.
 The binary search will be used to reach the next point where \(|\hat{X}|\) decreases.
