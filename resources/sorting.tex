@@ -223,18 +223,18 @@ Thus, computing \(X(t)\) has a time complexity of \(O(N \cdot P)\) where
 \begin{proof}
     Note that the naive definition of \(X(t)\) contains a geometric series.
     \begin{align*}
-        \sum_{k=1}^{N} \sum_{f=1}^{n_k} \sin(ft) 
-        &= \sum_{k=1}^{N} \Im \sum_{f=1}^{n_k} e^{ift} \\
-        &= \sum_{k=1}^{N} \Im \left( e^{it} \frac{e^{itn_k}-1}{e^{it}-1} \right) \\
-        &= \sum_{k=1}^{N} \Im \left( e^{it} \frac{e^{in_kt/2}(e^{in_kt/2} - e^{-in_kt/2})}
+        \sum_{k=1}^{N} \sum_{f=1}^{a_k} \sin(ft) 
+        &= \sum_{k=1}^{N} \Im \sum_{f=1}^{a_k} e^{ift} \\
+        &= \sum_{k=1}^{N} \Im \left( e^{it} \frac{e^{ita_k}-1}{e^{it}-1} \right) \\
+        &= \sum_{k=1}^{N} \Im \left( e^{it} \frac{e^{ia_kt/2}(e^{ia_kt/2} - e^{-ia_kt/2})}
             {e^{it/2}(e^{it/2} - e^{-it/2})} \right) \\
-        &= \sum_{k=1}^{N} \Im \left( e^{it} \frac{e^{in_kt/2}(2i\sin(n_kt/2))}
+        &= \sum_{k=1}^{N} \Im \left( e^{it} \frac{e^{ia_kt/2}(2i\sin(a_kt/2))}
             {e^{it} (2i\sin(t/2))} \right) \\
-        &= \sum_{k=1}^{N} \Im \left( e^{i(n_k+1)t/2} \frac{\sin(n_k t/2)}{\sin(t/2)} \right) \\
+        &= \sum_{k=1}^{N} \Im \left( e^{i(a_k+1)t/2} \frac{\sin(a_k t/2)}{\sin(t/2)} \right) \\
         &= \sum_{k=1}^{N} \Im \left(
-                ( \cos((n_k+1)t/2) + i\sin((n_k+1)t/2)) \frac{\sin(n_k t/2)}{\sin(t/2)}
+                ( \cos((a_k+1)t/2) + i\sin((a_k+1)t/2)) \frac{\sin(a_k t/2)}{\sin(t/2)}
             \right) \\
-        &= \sum_{k=1}^{N} \frac{\sin(n_k t/2)}{\sin(t/2)} \sin((n_k+1)t/2)
+        &= \sum_{k=1}^{N} \frac{\sin(a_k t/2)}{\sin(t/2)} \sin((a_k+1)t/2)
     \end{align*}
 \end{proof}
 
