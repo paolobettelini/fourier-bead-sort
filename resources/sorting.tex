@@ -7,6 +7,7 @@
 \usepackage{fullpage}
 \usepackage{hyperref}
 \usepackage{tikz}
+\usepackage{pgfplots}
 \usepackage{wrapfig}
 \usepackage{url}
 \usepackage{subfig}
@@ -133,7 +134,7 @@ to \(O(P)\) where \(P=\sum S_k\).
     \end{enumerate}
 \end{definition}
 
-\textit{Remark.} A numeric matrix is a matrix where each column is made of \(0\)s followed by
+\textit{Remark.} A numeric matrix is a matrix where each of the columns is made of \(0\)s followed by
 some amount of \(1\)s. Thus, each column represents a number in \(\mathbb{N}\)
 if the \(1\)s are counted.
 A numeric matrix is a representation of the matrix used in gravity sort.
@@ -405,7 +406,7 @@ and the cost of a binary search is \(O(\log(N))\),
 the final time complexity is \(O(D \cdot N \log(A))\).
 The space complexity is always \(O(1)\).
 
-\section{Conclusion}
+\section{Appendix}
 
 The time complexity of \(O(D \cdot N \log(A))\), where \(A\)
 is the average distance between two consecutive sorted
@@ -416,8 +417,27 @@ An important property of this algorithm is its case-independence.
 The initial orderliness of the array (best case, average case and best case)
 do not affect the performance.
 
+\pagebreak
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}
+    \begin{axis}[
+        xmode=log,
+        ymode=log,
+        xlabel={array size [\textit{bytes}]},
+        ylabel={time [\textit{ms}]},
+        ]
+        \addplot table [x=a, y=b, col sep=comma] {data.csv};
+        \addplot table [x=a, y=c, col sep=comma] {data.csv};
+    \end{axis}
+\end{tikzpicture}
+\caption{Time complexity: gravity (blue) vs tim sort (red)}
+\end{figure}
+
 \nocite{*} % cite all entries
 
 \printbibliography
+\listoffigures
 
 \end{document}
