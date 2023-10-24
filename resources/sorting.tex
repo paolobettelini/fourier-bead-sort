@@ -44,12 +44,15 @@
 
 \subsection{Abstract}
 
-Bead sort has always been an interesting, but rather useless, sorting algorithm
-for natural numbers. It is able to sort numbers without ever directly comparing them.
-This paper presents an attempt to make it possibly more efficient
-for software when sorting large arrays of numbers.
-The resulting algorithm is more efficient (less than \(O(N^2)\)) when sorting a very large array of small integers,
-preferably with few distinct elements.
+The Bead sort has consistently piqued interest due to its unique attribute of
+sorting natural numbers without direct comparisons.
+However, it has typically been considered impractical for practical applications.
+This paper introduces an endeavor to potentially enhance its efficiency when
+sorting substantial arrays of numbers in software systems.
+
+The resultant algorithm exhibits improved efficiency,
+achieving a time complexity of less than \(O(N^2)\), particularly when applied to the sorting of extensive
+arrays containing small natural numbers, ideally with a limited number of distinct elements.
 
 \subsection{Bead sort}
 
@@ -412,12 +415,18 @@ The time complexity of \(O(D \cdot N \log(A))\), where \(A\)
 is the average distance between two consecutive sorted
 elements and \(D\) is the amount of distinct elements in the array,
 can be sometimes advantageous.
+Of course, the value \(A\) needs to be gussed to perform the retrieval of the values properly.
 
-An important property of this algorithm is its case-independence.
-The initial orderliness of the array (best case, average case and best case)
-do not affect the performance.
+An essential characteristic of this algorithm is its case-independence. The initial arrangement of the array, whether in the best case, average case, or worst case scenarios, does not influence its performance.
+Furthermore, it is worth noting that the algorithm can be parallelized,
+allowing for its execution across multiple processors.
 
 \pagebreak
+
+The following benchmark evaluates the sorting performance of arrays featuring a uniform random distribution.
+The initial benchmark (\ref{fig:bench1}) focuses on natural numbers drawn from the set \(\{1, 2, 3\}\),
+whereas the subsequent benchmark (\ref{fig:bench2}) examines natural numbers within the set \(\{1, 2, 3, 4, 5, 6, 7, 8, 9, 10\}\).
+In both scenarios, a linear scan with a constant value of \(A=1\) is employed.
 
 \begin{figure}[ht]
 \centering
@@ -428,12 +437,32 @@ do not affect the performance.
         xlabel={array size [\textit{bytes}]},
         ylabel={time [\textit{ms}]},
         ]
-        \addplot table [x=a, y=b, col sep=comma] {data.csv};
-        \addplot table [x=a, y=c, col sep=comma] {data.csv};
+        \addplot table [x=a, y=b, col sep=comma] {data1.csv};
+        \addplot table [x=a, y=c, col sep=comma] {data1.csv};
     \end{axis}
 \end{tikzpicture}
-\caption{Time complexity: gravity (blue) vs tim sort (red)}
+\caption{Benchmark 1: gravity (blue) vs naive quicksort (red)}
+\label{fig:bench1}
 \end{figure}
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}
+    \begin{axis}[
+        xmode=log,
+        ymode=log,
+        xlabel={array size [\textit{bytes}]},
+        ylabel={time [\textit{ms}]},
+        ]
+        \addplot table [x=a, y=b, col sep=comma] {data2.csv};
+        \addplot table [x=a, y=c, col sep=comma] {data2.csv};
+    \end{axis}
+\end{tikzpicture}
+\caption{Benchmark 2: gravity (blue) vs naive quicksort (red)}
+\label{fig:bench2}
+\end{figure}
+
+\pagebreak
 
 \nocite{*} % cite all entries
 

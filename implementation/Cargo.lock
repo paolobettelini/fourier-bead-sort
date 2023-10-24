@@ -31,6 +31,7 @@ version = "0.1.0"
 dependencies = [
  "num-complex",
  "rand",
+ "rust_quicksort",
 ]
 
 [[package]]
@@ -92,6 +93,12 @@ checksum = "ec0be4795e2f6a28069bec0b5ff3e2ac9bafc99e6a9a7dc3547996c5c816922c"
 dependencies = [
  "getrandom",
 ]
+
+[[package]]
+name = "rust_quicksort"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d2c17409036f5cfdfe10e5ac54db0e57e4e16077a8539e29268fcbeb080805ec"
 
 [[package]]
 name = "wasi"

@@ -8,3 +8,5 @@ edition = "2021"
 [dependencies]
 num-complex = "0.4.3"
 rand = "0.8.5"
+
+rust_quicksort = "0.1.0"
