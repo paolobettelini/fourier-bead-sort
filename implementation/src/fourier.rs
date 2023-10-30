@@ -1,7 +1,7 @@
 extern crate num_complex;
 
-use std::f64::consts::PI;
 use num_complex::*;
+use std::f64::consts::PI;
 
 pub fn sort(n: &[u32], res: &mut [u32]) {
     let max = *n.iter().max().unwrap();
@@ -10,7 +10,8 @@ pub fn sort(n: &[u32], res: &mut [u32]) {
     let mut last_value = 0;
     let mut current_index = 0;
 
-    for freq in 1..=(max + 1) { // or =max and know that the last one is the max value itself
+    for freq in 1..=(max + 1) {
+        // or =max and know that the last one is the max value itself
         let v = get_frequency(&n, freq as f64);
         // println!("{freq} -- {v}");
         let v = v.round() as i32;
@@ -27,10 +28,10 @@ pub fn sort(n: &[u32], res: &mut [u32]) {
         last_freq = freq as i32;
         last_value = v;
     }
-} 
+}
 
 fn get_frequency(n: &[u32], freq: f64) -> f64 {
-    let mut sum =0.0;
+    let mut sum = 0.0;
 
     for k in 0..n.len() {
         sum += fourier_integral(n[k] as f64, freq);
@@ -40,16 +41,14 @@ fn get_frequency(n: &[u32], freq: f64) -> f64 {
 }
 
 fn f(t: f64, n_k: f64) -> f64 {
-    (t * 0.5 * n_k).sin()
-    / (0.5 * t).sin()
-    * ((n_k + 1.0) * 0.5 * t).sin()
+    (t * 0.5 * n_k).sin() / (0.5 * t).sin() * ((n_k + 1.0) * 0.5 * t).sin()
 }
 
 fn fourier_integral(n_k: f64, freq: f64) -> f64 {
     let n = 50;
     let a = 0.0;
     let b = 2.0 * PI;
-    
+
     let delta_t = (b - a) / (n as f64);
     let mut sum = Complex::new(0.0, 0.0);
 
@@ -63,7 +62,7 @@ fn fourier_integral(n_k: f64, freq: f64) -> f64 {
     }
 
     let approx = sum * delta_t;
-    let approx = approx.norm() / (b-a) * 2.0;
+    let approx = approx.norm() / (b - a) * 2.0;
 
     approx
 }
