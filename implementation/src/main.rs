@@ -8,6 +8,8 @@ fn main() {
     let mut res = vec![];
     let mut sizes = vec![];
 
+    sizes = vec![10];
+
     // 10, 20, ..., 90, 100, 200, ..., 900, 1000, 2000, ...
     for i in 1..5 {
         for n in 1..10 {
@@ -21,6 +23,7 @@ fn main() {
     // Sort arrays
     for n in sizes {
         let (time1, time2) = benchmark(n);
+        println!("{},{},{}", n, time1, time2);
         res.push((n, time1, time2));
     }
 
@@ -34,14 +37,16 @@ fn benchmark(size: usize) -> (u128, u128) {
     let mut n = vec![0u32; size];
     let mut rng = rand::thread_rng();
     for i in 0..size {
-        let y: f64 = rng.gen(); // generates a float between 0 and 1
+        let y: f64 = rng.gen_range(0.0..1.0); // generates a float between 0 and 1
         n[i] = (y * 9.0 + 1.0) as u32;
     }
 
     let mut res = n.clone();
 
     let start_time = Instant::now();
+    //println!("{:?}", &res);
     fourier::sort(&n, &mut res);
+    //println!("{:?}", &res);
     let end_time = Instant::now();
     let time1 = (end_time - start_time).as_millis();
 

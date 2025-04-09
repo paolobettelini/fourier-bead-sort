@@ -1,6 +1,3 @@
-extern crate num_complex;
-
-use num_complex::*;
 use std::f64::consts::PI;
 
 pub fn sort(n: &[u32], res: &mut [u32]) {
@@ -50,19 +47,22 @@ fn fourier_integral(n_k: f64, freq: f64) -> f64 {
     let b = 2.0 * PI;
 
     let delta_t = (b - a) / (n as f64);
-    let mut sum = Complex::new(0.0, 0.0);
+    // let mut sum = Complex::new(0.0, 0.0);
+    let mut sum = 0.0;
 
     for k in 0..n {
         let t = a + (k as f64 + 0.5) * delta_t;
 
         let f = f(t, n_k);
-        let exp_term = Complex::new((-freq * t).cos(), (-freq * t).sin());
+        //let exp_term = Complex::new((-freq * t).cos(), (-freq * t).sin());
+        let exp_term = (freq * t).sin(); // don't need the cosine term
 
         sum += exp_term * f;
     }
 
     let approx = sum * delta_t;
-    let approx = approx.norm() / (b - a) * 2.0;
+    // let approx = approx.norm() / (b - a) * 2.0;
+    let approx = approx.abs() / (b - a) * 2.0;
 
     approx
 }

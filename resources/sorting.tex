@@ -266,11 +266,11 @@ The amount of \(1\)s in the row corresponding to the frequency \(\xi\) is given 
     The closed-form for \(\hat{X}(\xi)\) is given by
     \[
         \hat{X}(\xi) =
-        \frac{1}{2\pi}
+        \frac{-i}{\pi}
         \sum_{k=1}^{N}
         \,
         \integral[0][2\pi]
-        [\frac{\sin(a_k t/2)}{\sin(t/2)} \sin((a_k+1)t/2)e^{-2\pi it\xi}]
+        [\frac{\sin(a_k t/2)}{\sin(t/2)} \sin((a_k+1)t/2)\sin(2\pi t\xi)]
         [t]
     \]
 \end{corollary}
@@ -286,18 +286,23 @@ The amount of \(1\)s in the row corresponding to the frequency \(\xi\) is given 
         \integral[0][2\pi]
         [e^{-2\pi it\xi}\sum_{k=1}^{N} \frac{\sin(a_k t/2)}{\sin(t/2)} \sin((a_k+1)t/2)]
         [t]
-        \\ 
-    \end{align*}
-    
-    Since \(N\) is finite, we can apply an
-    interchange of summation and integration
-    \[
-        \hat{X}(\xi) =
-        \frac{1}{2\pi}
+        \\
+        &= \frac{1}{2\pi}
         \sum_{k=1}^{N}
         \,
         \integral[0][2\pi]
         [\frac{\sin(a_k t/2)}{\sin(t/2)} \sin((a_k+1)t/2)e^{-2\pi it\xi}]
+        [t]
+    \end{align*}
+    Since out signal function does not contain any cosine component, we can only consider the sine
+    component of \(e^{-2\pi it\xi}\). The integral thus becomes
+    \[
+        \hat{X}(\xi) =
+        \frac{-i}{\pi}
+        \sum_{k=1}^{N}
+        \,
+        \integral[0][2\pi]
+        [\frac{\sin(a_k t/2)}{\sin(t/2)} \sin((a_k+1)t/2)\sin(2\pi t\xi)]
         [t]
     \]
 \end{proof}
@@ -372,12 +377,12 @@ The values of \(|\hat{\xi}|\) are easy to guess by looking at \(X(t)\).
 
 \begin{center}
 \begin{tikzcd}
-    \hat{X}(1)=6 \arrow[r, "k=1"', bend right] & \hat{X}(2)=5 \arrow[r, "k=1"', bend right] & \hat{X}(3)=4 \arrow[r, "k=1"', bend right] & \hat{X}(4)=3 \\
-    \hat{X}(5)=3 \arrow[r, "k=2"', bend right] & \hat{X}(6)=1 \arrow[r, "k=1", bend right]  & \hat{X}(7)=0 \arrow[r, "k=0"', bend right] & \hat{X}(8)=0
+    \left|\hat{X}(1)\right|=6 \arrow[r, "k=1"', bend right] & \left|\hat{X}(2)\right|=5 \arrow[r, "k=1"', bend right] & \left|\hat{X}(3)\right|=4 \arrow[r, "k=1"', bend right] & \left|\hat{X}(4)\right|=3 \\
+    \left|\hat{X}(5)\right|=3 \arrow[r, "k=2"', bend right] & \left|\hat{X}(6)\right|=1 \arrow[r, "k=1"', bend right]  & \left|\hat{X}(7)\right|=0 \arrow[r, "k=0"', bend right] & \left|\hat{X}(8)\right|=0
 \end{tikzcd}
 \end{center}
 
-Note that \(\hat{X}(\xi) = 0\) for \(\xi > 6\).
+Note that \(|\hat{X}(\xi)| = 0\) for \(\xi > 6\).
 We are looking for the cases where \(k \neq 0\). \\
 \begin{enumerate}
     \item At frequency \(1\), the value \(6\) decreases to \(5\), meaning that the first sorted element is \(1\).
